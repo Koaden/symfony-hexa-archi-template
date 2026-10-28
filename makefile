@@ -17,7 +17,7 @@ test: phpunit
 
 .PHONY: phpunit
 phpunit:
-	$(COMPOSE_TEST) run --rm --build php bin/phpunit
+	$(COMPOSE_TEST) run --rm --build php php bin/phpunit
 
 .PHONY: lint
 lint: phpstan php-cs-fixer deptrac

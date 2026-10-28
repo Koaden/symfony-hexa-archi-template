@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Domain\Event;
+namespace App\Tests\PHPUnit\Domain\Event;
 
 use App\Domain\Event\EventInterface;
 use App\Domain\Event\EventsRegisterer;

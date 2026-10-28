@@ -11,8 +11,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
-    name: Tests
+  ci:
+    name: Test and lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -24,15 +24,6 @@ jobs:
       - name: Run tests
         run: make test
 
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Prepare environment
-        uses: ./.github/actions/prepare-env
-
       - name: Run lint
+        if: ${{ !cancelled() }}
         run: make lint

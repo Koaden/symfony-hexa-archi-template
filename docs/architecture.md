@@ -120,17 +120,16 @@ make deptrac # Deptrac layer rules
 make lint        # PHPStan (max), PHP-CS-Fixer, Deptrac
 ```
 
-PHPUnit tests are split by type:
+PHPUnit tests live under `tests/PHPUnit`:
 
 ```text
 tests/
-├── Unit/         Fast tests with no container
-├── Integration/  Tests against Doctrine, Messenger or other adapters
-└── Functional/   HTTP and full-stack tests
+└── PHPUnit/
+    └── Domain/Event/EventsRegistererTest.php
 ```
 
-Each suite is declared in `phpunit.dist.xml`. The PHPUnit result cache lives in
-`.phpunit.cache` and is ignored by Git and Docker.
+The suite is declared in `phpunit.dist.xml`. The PHPUnit result cache lives in
+`tests/PHPUnit/.phpunit.cache` and is ignored by Git and Docker.
 
 Tests use the container environment. There are no app-level `.env` files;
 configuration comes from the root `.env` through Compose.
