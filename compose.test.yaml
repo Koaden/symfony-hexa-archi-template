@@ -1,0 +1,18 @@
+services:
+  php:
+    image: ${COMPOSE_PROJECT_NAME:-app}-php:test
+    build:
+      target: test
+    environment:
+      APP_ENV: test
+      APP_SECRET: test
+    volumes: []
+
+  db:
+    volumes:
+      - db_data_test:/var/lib/postgresql/data
+    tmpfs:
+      - /tmp
+
+volumes:
+  db_data_test:

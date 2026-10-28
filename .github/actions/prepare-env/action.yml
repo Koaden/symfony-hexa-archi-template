@@ -1,0 +1,9 @@
+name: Prepare environment
+description: Create the application .env file from .env.dist
+
+runs:
+  using: composite
+  steps:
+    - name: Copy environment file
+      shell: bash
+      run: cp .env.dist .env

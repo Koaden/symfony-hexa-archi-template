@@ -1,0 +1,5 @@
+:80 {
+    root * /app/apps/symfony/public
+    php_server
+    file_server
+}

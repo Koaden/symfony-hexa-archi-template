@@ -1,0 +1,11 @@
+/.env
+/apps/symfony/.env
+/apps/symfony/.env.*
+/apps/symfony/vendor/
+/apps/symfony/var/
+/apps/symfony/public/build/
+/apps/symfony/node_modules/
+/apps/symfony/.phpunit.cache/
+/apps/symfony/.php-cs-fixer.cache
+/apps/symfony/.deptrac.cache
+.DS_Store

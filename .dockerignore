@@ -1,0 +1,12 @@
+.git
+.env
+**/.env.local
+**/.env.*.local
+apps/symfony/vendor
+apps/symfony/var
+apps/symfony/public/build
+apps/symfony/node_modules
+**/.phpunit.cache
+**/.php-cs-fixer.cache
+**/.deptrac.cache
+**/.DS_Store
