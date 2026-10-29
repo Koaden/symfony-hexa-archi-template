@@ -21,3 +21,14 @@
 ###< phpunit/phpunit ###
 
 /.deptrac.cache
+
+###> symfony/asset-mapper ###
+/public/assets/
+/assets/vendor/
+###< symfony/asset-mapper ###
+
+###> lint ###
+/apps/symfony/lint/phpstan/.phpstan-cache/
+/apps/symfony/lint/php-cs-fixer/.php-cs-fixer.cache
+/apps/symfony/lint/deptrac/.deptrac.cache
+###< lint ###

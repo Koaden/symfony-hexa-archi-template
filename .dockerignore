@@ -5,8 +5,11 @@
 apps/symfony/vendor
 apps/symfony/var
 apps/symfony/public/build
+apps/symfony/public/assets
 apps/symfony/node_modules
+apps/symfony/assets/vendor
 **/.phpunit.cache
 **/.php-cs-fixer.cache
+**/.phpstan-cache
 **/.deptrac.cache
 **/.DS_Store

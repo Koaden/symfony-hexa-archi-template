@@ -1,0 +1,149 @@
+:root {
+    --hue: 220;
+    --light-color: #f8fafc;
+    --accent: #224fc9;
+    --border: #dbe3f0;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 18px;
+}
+
+body {
+    margin: 0;
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    color: #1f2937;
+    background: var(--light-color);
+}
+
+.hero {
+    background: linear-gradient(145deg, #1e3a8a 0%, #a42fd2 100%);
+    color: #ffffff;
+    padding: 3rem 1.25rem;
+}
+
+.wrapper {
+    width: min(100% - 2rem, 72rem);
+    margin: 0 auto;
+}
+
+.logo {
+    display: flex;
+    align-items: start;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.logo svg {
+    width: 3.5rem;
+    height: 3.5rem;
+    flex: 0 0 auto;
+}
+
+.logo h1 {
+    margin: 0;
+    font-size: clamp(2rem, 6vw, 3rem);
+    line-height: 1.1;
+}
+
+.logo h1 small {
+    display: block;
+    font-size: 1rem;
+    opacity: 0.85;
+}
+
+.info ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.info li {
+    margin: 0.75rem 0;
+}
+
+.info code {
+    font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+    font-size: 0.9rem;
+}
+
+main {
+    padding: 2rem 0 4rem;
+}
+
+.wrapper article {
+    display: grid;
+    gap: 2rem;
+}
+
+.docs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: 1.5rem;
+}
+
+.docs-grid section,
+.demo {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+}
+
+.docs-grid h2,
+.demo h2 {
+    margin-top: 0;
+    font-size: 1.25rem;
+}
+
+.docs-grid ul {
+    padding-left: 1.25rem;
+    margin-bottom: 0;
+}
+
+.docs-grid li + li {
+    margin-top: 0.5rem;
+}
+
+a {
+    color: var(--accent);
+}
+
+button {
+    font: inherit;
+    padding: 0.7rem 1rem;
+    color: #ffffff;
+    background: var(--accent);
+    border: 0;
+    border-radius: 0.5rem;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #1d4ed8;
+}
+
+#demo-result {
+    margin-top: 1rem;
+    min-height: 1.5rem;
+    color: #4b5563;
+}
+
+@media (max-width: 640px) {
+    html {
+        font-size: 17px;
+    }
+
+    .hero {
+        padding: 2rem 1rem;
+    }
+
+    .docs-grid {
+        grid-template-columns: 1fr;
+    }
+}

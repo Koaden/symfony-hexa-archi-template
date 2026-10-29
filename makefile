@@ -13,26 +13,30 @@ stop:
 	$(COMPOSE_PROD) down --remove-orphans 2>/dev/null || true
 
 .PHONY: test 
-test: phpunit
+test: phpunit behat
 
 .PHONY: phpunit
 phpunit:
-	$(COMPOSE_TEST) run --rm --build php php bin/phpunit
+	$(COMPOSE_TEST) run --rm --build php php bin/phpunit --configuration=tests/PHPUnit/phpunit.xml
+
+.PHONY: behat
+behat:
+	$(COMPOSE_TEST) run --rm --build php vendor/bin/behat --config=tests/Behat/behat.yml
 
 .PHONY: lint
 lint: phpstan php-cs-fixer deptrac
 
 .PHONY: phpstan
 phpstan:
-	$(COMPOSE_TEST) run --rm --build php vendor/bin/phpstan analyse --no-progress
+	$(COMPOSE_TEST) run --rm --build php vendor/bin/phpstan analyse -c lint/phpstan/phpstan.neon --no-progress
 
 .PHONY: php-cs-fixer
 php-cs-fixer:
-	$(COMPOSE_TEST) run --rm --build php vendor/bin/php-cs-fixer fix --dry-run --diff
+	$(COMPOSE_TEST) run --rm --build php vendor/bin/php-cs-fixer fix --config=lint/php-cs-fixer/.php-cs-fixer.php --dry-run --diff
 
 .PHONY: deptrac
 deptrac:
-	$(COMPOSE_TEST) run --rm --build php vendor/bin/deptrac analyse --no-progress
+	$(COMPOSE_TEST) run --rm --build php vendor/bin/deptrac analyse --config-file=lint/deptrac/deptrac.yaml --no-progress
 
 
 .PHONY: database.reset
