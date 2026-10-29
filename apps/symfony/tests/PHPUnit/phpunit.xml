@@ -7,8 +7,8 @@
          failOnDeprecation="true"
          failOnNotice="true"
          failOnWarning="true"
-         bootstrap="tests/bootstrap.php"
-         cacheDirectory="tests/PHPUnit/.phpunit.cache"
+         bootstrap="../bootstrap.php"
+         cacheDirectory=".phpunit.cache"
 >
     <php>
         <ini name="display_errors" value="1" />
@@ -17,12 +17,13 @@
         <server name="APP_SECRET" value="test" force="true" />
         <server name="APP_SHARE_DIR" value="var/share" force="true" />
         <server name="DEFAULT_URI" value="http://localhost" force="true" />
+        <server name="KERNEL_CLASS" value="App\Kernel" force="true" />
         <server name="SHELL_VERBOSITY" value="-1" />
     </php>
 
     <testsuites>
         <testsuite name="Unit">
-            <directory>tests/PHPUnit</directory>
+            <directory>.</directory>
         </testsuite>
     </testsuites>
 
@@ -32,7 +33,7 @@
             restrictWarnings="true"
     >
         <include>
-            <directory>src</directory>
+            <directory>../src</directory>
         </include>
 
         <deprecationTrigger>

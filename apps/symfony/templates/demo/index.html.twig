@@ -1,0 +1,81 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'demo.welcome_suffix'|trans }}{% endblock %}
+
+{% block body %}
+    <header class="hero">
+        <div class="wrapper">
+            <section class="logo">
+                <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" height="72" width="72" viewBox="0 0 64.9 64.9">
+                    <path fill="currentColor" d="M32.5 0A32.5 32.5 0 0 0 0 32.5a32.5 32.5 0 0 0 32.5 32.4 32.5 32.5 0 0 0 32.4-32.4A32.5 32.5 0 0 0 32.5 0Zm14.1 12c3.3-.1 5.8 1.4 6 3.8 0 1-.6 3-2.6 3-1.5 0-2.6-.9-2.6-2.2 0-.5 0-1 .4-1.5.4-.6.4-.7.4-1 0-.9-1.3-.9-1.7-.9-4.8.2-6.1 6.8-7.2 12.1l-.5 2.8c2.8.4 4.8 0 6-.8 1.5-1-.5-2-.2-3.2a2.3 2.3 0 0 1 2.1-1.8c1.2 0 2 1.2 2 2.5 0 2-2.7 5-8.2 4.8l-2-.1-1 5.7c-.9 4.3-2.1 10.3-6.5 15.4a13.4 13.4 0 0 1-9.4 5.3c-3.2.1-5.4-1.6-5.4-3.9-.1-2.2 1.9-3.4 3.1-3.5 1.8 0 3 1.2 3 2.6 0 1.3-.6 1.6-1 1.9-.3.2-.7.4-.7 1 0 .1.2.6 1 .6 1.3 0 2.2-.7 2.9-1.2 3.1-2.6 4.3-7.1 5.9-15.4l.3-2c.6-2.8 1.2-5.8 2-8.8-2.1-1.6-3.5-3.7-6.4-4.5-2-.6-3.3-.1-4.2 1a3 3 0 0 0 .3 4l1.7 1.9c2 2.3 3.1 4.1 2.7 6.6-.7 3.9-5.3 6.9-10.9 5.2-4.7-1.4-5.6-4.8-5-6.6.5-1.6 1.8-2 3-1.6 1.4.5 2 2 1.5 3.3 0 .2 0 .4-.2.7l-.6 1c-.3 1 1 1.7 2 2 2.1.7 4.2-.4 4.7-2.1.5-1.6-.5-2.7-1-3.1l-2-2.1c-.8-1-2.8-3.9-1.9-7a6.8 6.8 0 0 1 2.4-3.5c2.4-1.8 5-2 7.6-1.3 3.2.9 4.8 3 6.8 4.7a28 28 0 0 1 5.1-9.3c2.2-2.6 5-4.4 8.3-4.5z"/>
+                </svg>
+                <h1>
+                    <small>{{ 'demo.welcome_prefix'|trans }}</small>
+                    <span>{{ 'demo.welcome_suffix'|trans }}</span>
+                </h1>
+            </section>
+
+            <section class="info">
+                <ul>
+                    <li>
+                        <span>{{ 'demo.info'|trans }}</span>
+                    </li>
+                </ul>
+            </section>
+        </div>
+    </header>
+
+    <main>
+        <div class="wrapper">
+            <article>
+                <section class="demo">
+                    <h2>{{ 'demo.htmx.title'|trans }}</h2>
+                    <p>{{ 'demo.htmx.description'|trans }}</p>
+                    <a
+                        href="{{ path('demo.now') }}"
+                        hx-boost="true"
+                        hx-target="#demo-result"
+                        hx-swap="innerHTML"
+                    >
+                        {{ 'demo.htmx.button'|trans }}
+                    </a>
+                    <div id="demo-result"></div>
+                </section>
+
+                <h2>{{ 'demo.documentations'|trans }}</h2>
+                <nav class="docs-grid">
+                    <section>
+                        <h3>{{ 'demo.project'|trans }}</h3>
+                        <ul>
+                            <li><a href="https://github.com/Koaden/symfony-hexa-archi-template" target="_blank" rel="noreferrer">{{ 'demo.link.repository'|trans }}</a></li>
+                            <li><a href="https://github.com/Koaden/symfony-hexa-archi-template/blob/main/docs/architecture.md" target="_blank" rel="noreferrer">{{ 'demo.link.architecture'|trans }}</a></li>
+                            <li><a href="https://github.com/Koaden/symfony-hexa-archi-template/blob/main/docs/docker.md" target="_blank" rel="noreferrer">{{ 'demo.link.docker'|trans }}</a></li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h3>{{ 'demo.stack'|trans }}</h3>
+                        <ul>
+                            <li><a href="https://symfony.com/doc/7.4" target="_blank" rel="noreferrer">{{ 'demo.link.symfony'|trans }}</a></li>
+                            <li><a href="https://docs.docker.com/" target="_blank" rel="noreferrer">{{ 'demo.link.docker'|trans }}</a></li>
+                            <li><a href="https://twig.symfony.com/doc/3.x/" target="_blank" rel="noreferrer">{{ 'demo.link.twig'|trans }}</a></li>
+                            <li><a href="https://htmx.org/docs/" target="_blank" rel="noreferrer">{{ 'demo.link.htmx'|trans }}</a></li>
+                            <li><a href="https://symfony.com/doc/current/frontend/asset_mapper.html" target="_blank" rel="noreferrer">{{ 'demo.link.asset_mapper'|trans }}</a></li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h3>{{ 'demo.tests'|trans }}</h3>
+                        <ul>
+                            <li><a href="https://phpunit.de/documentation.html" target="_blank" rel="noreferrer">{{ 'demo.link.phpunit'|trans }}</a></li>
+                            <li><a href="https://phpstan.org/documentation" target="_blank" rel="noreferrer">{{ 'demo.link.phpstan'|trans }}</a></li>
+                            <li><a href="https://github.com/php-cs-fixer/php-cs-fixer#documentation" target="_blank" rel="noreferrer">{{ 'demo.link.php_cs_fixer'|trans }}</a></li>
+                            <li><a href="https://deptrac.github.io/deptrac/" target="_blank" rel="noreferrer">{{ 'demo.link.deptrac'|trans }}</a></li>
+                            <li><a href="https://docs.behat.org/en/latest/guides.html" target="_blank" rel="noreferrer">{{ 'demo.link.behat'|trans }}</a></li>
+                        </ul>
+                    </section>
+                </nav>
+            </article>
+        </div>
+    </main>
+{% endblock %}

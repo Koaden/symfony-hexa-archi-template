@@ -58,6 +58,7 @@ COPY docker/frankenphp/Caddyfile.test /etc/frankenphp/Caddyfile
 
 RUN if [ -f composer.json ]; then \
         composer install --no-interaction --prefer-dist --optimize-autoloader --no-scripts; \
+        php bin/console importmap:install --no-interaction; \
     fi
 
 CMD ["frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile", "--adapter", "caddyfile"]
@@ -75,6 +76,8 @@ RUN set -e; \
     if [ -f composer.json ]; then \
         composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-scripts; \
         composer dump-autoload --optimize --classmap-authoritative; \
+        php bin/console importmap:install; \
+        php bin/console asset-map:compile --env=prod; \
     fi; \
     chown -R www-data:www-data /app/apps/symfony/var 2>/dev/null || true
 
