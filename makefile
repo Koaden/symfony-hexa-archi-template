@@ -78,3 +78,15 @@ db.backup:
 db.restore:
 	@test -n "$(FILE)" || (echo "Usage: make db.restore.prod FILE=backups/db-YYYYMMDD-HHMMSS.dump"; exit 1)
 	$(COMPOSE_PROD) exec -T db sh -c 'pg_restore -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" --clean --if-exists' < "$(FILE)"
+
+.PHONY: importmap.install
+importmap.install:
+	$(COMPOSE_DEV) run --rm --build php php bin/console importmap:install
+
+.PHONY: importmap.update
+importmap.update:
+	$(COMPOSE_DEV) run --rm --build php php bin/console importmap:update
+
+.PHONY: importmap.audit
+importmap.audit:
+	$(COMPOSE_DEV) run --rm --build php php bin/console importmap:audit
