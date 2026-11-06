@@ -2,7 +2,7 @@
 
 This template provides a Symfony (LTS version: 7.4) project setup with an hexagonal architecture and running entirely in docker containers ready for development, test and production.
 
-Stack: FrankenPHP (Caddy) + PHP 8.4, PostgreSQL 16, Docker Compose and a Makefile. See [docs/docker.md](docs/docker.md) for the dockerisation details and [docs/architecture.md](docs/architecture.md) for the application layers.
+Stack: FrankenPHP (Caddy) + PHP 8.4, PostgreSQL 18, Docker Compose and a Makefile. See [docs/docker.md](docs/docker.md) for the dockerisation details and [docs/architecture.md](docs/architecture.md) for the application layers.
 
 ## Requirements
 

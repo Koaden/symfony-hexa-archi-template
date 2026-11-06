@@ -10,7 +10,7 @@ flowchart LR
 
     subgraph APP["Docker network: app"]
         P["php<br/>FrankenPHP + Caddy<br/>/app/apps/symfony<br/>APP_ENV: dev | test | prod"]
-        D["db<br/>PostgreSQL 16<br/>db:5432"]
+        D["db<br/>PostgreSQL 18<br/>db:5432"]
         P -->|"DATABASE_URL"| D
     end
 
@@ -59,7 +59,7 @@ short and readable (`Caddyfile`), it provisions and renews TLS certificates
 automatically, and it compresses with zstd/brotli/gzip. Nginx would mean a second
 process, a second config language, and a separate certificate workflow.
 
-### PostgreSQL 16 (alpine)
+### PostgreSQL 18 (alpine)
 
 - mature and fully supported by Doctrine DBAL/ORM;
 - strong consistency and rich SQL, useful for a domain-heavy application;
