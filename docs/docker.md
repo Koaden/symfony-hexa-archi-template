@@ -65,7 +65,9 @@ process, a second config language, and a separate certificate workflow.
 - strong consistency and rich SQL, useful for a domain-heavy application;
 - `-alpine` keeps the image small;
 - the `pg_isready` healthcheck gives Compose a reliable readiness signal, so PHP
-  starts only once the database accepts connections.
+  starts only once the database accepts connections;
+- PostgreSQL 18 stores data under `/var/lib/postgresql` (major-version-specific
+  subdirectory), so Compose mounts that path rather than `.../data`.
 
 ### Multi-stage Dockerfile
 
@@ -178,6 +180,7 @@ The variables have one consumer each:
   needs them, while the application only needs the resulting URL.
 - `APP_SECRET`, `APP_SHARE_DIR` and `DEFAULT_URI` are injected into PHP from the
   root `.env`; `APP_ENV` comes from the Compose profile.
+- `SENTRY_DSN` is optional; an empty value disables Sentry reporting.
 
 Required production values:
 
@@ -229,6 +232,7 @@ pipelines.
 | `db_data` | dev | Development database |
 | `db_data_test` | test | Test database |
 | `db_data_prod` | prod | Production database |
+| `db_backups` | prod | Automatic daily database backups |
 | `caddy_data` | dev/prod | TLS certificates and Caddy state |
 | `caddy_config` | dev/prod | Caddy runtime config |
 

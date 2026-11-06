@@ -4,6 +4,17 @@ This template provides a Symfony (LTS version: 7.4) project setup with an hexago
 
 Stack: FrankenPHP (Caddy) + PHP 8.4, PostgreSQL 18, Docker Compose and a Makefile. See [docs/docker.md](docs/docker.md) for the dockerisation details and [docs/architecture.md](docs/architecture.md) for the application layers.
 
+## Documentation
+
+- [Docker setup](docs/docker.md)
+- [Architecture](docs/architecture.md)
+- [Database backups](docs/backups.md)
+
+## Operations
+
+- **Dependabot** (`.github/dependabot.yml`): weekly updates for Composer, Docker images and GitHub Actions.
+- **Sentry**: set `SENTRY_DSN` in `.env` (empty disables it). The bundle is enabled in `prod` only.
+
 ## Requirements
 
 - [Docker](https://docs.docker.com/engine/install/)

@@ -10,3 +10,5 @@ apps/symfony/node_modules
 **/.php-cs-fixer.cache
 **/.deptrac.cache
 **/.DS_Store
+
+backups/

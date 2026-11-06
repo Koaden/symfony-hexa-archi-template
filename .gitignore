@@ -9,3 +9,6 @@
 /apps/symfony/.php-cs-fixer.cache
 /apps/symfony/.deptrac.cache
 .DS_Store
+
+# Database backups
+/backups/

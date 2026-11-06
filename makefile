@@ -64,3 +64,13 @@ prod:
 .PHONY: dev.build
 dev.build:
 	$(COMPOSE_DEV) build
+
+.PHONY: db.backup
+db.backup:
+	@mkdir -p backups
+	$(COMPOSE_PROD) exec -T db sh -c 'pg_dump -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" -Fc' > backups/db-$(shell date +%Y%m%d-%H%M%S).dump
+
+.PHONY: db.restore
+db.restore:
+	@test -n "$(FILE)" || (echo "Usage: make db.restore.prod FILE=backups/db-YYYYMMDD-HHMMSS.dump"; exit 1)
+	$(COMPOSE_PROD) exec -T db sh -c 'pg_restore -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" --clean --if-exists' < "$(FILE)"
