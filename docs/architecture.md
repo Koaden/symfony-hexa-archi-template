@@ -32,6 +32,14 @@ src/
 
 Configuration is PHP files under `config/` (packages, services, routes). YAML is not used.
 
+Presentation assets and templates live outside `src/`:
+
+```text
+templates/            Twig templates, including HTMX partials
+assets/               AssetMapper JavaScript and CSS
+src/Twig/Components/  Symfony UX Twig components
+```
+
 ## Dependency rules
 
 | Layer | May depend on |

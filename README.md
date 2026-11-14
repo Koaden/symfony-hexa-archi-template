@@ -9,6 +9,7 @@ Stack: FrankenPHP (Caddy) + PHP 8.4, PostgreSQL 18, Docker Compose and a Makefil
 - [Docker setup](docs/docker.md)
 - [Architecture](docs/architecture.md)
 - [Database backups](docs/backups.md)
+- [Frontend](docs/frontend.md)
 
 ## Operations
 

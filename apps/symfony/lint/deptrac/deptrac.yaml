@@ -1,6 +1,7 @@
 parameters:
   paths:
-    - ./src
+    - ../../src
+  cache_file: lint/deptrac/.deptrac.cache
   layers:
     - name: Domain
       collectors:
@@ -10,6 +11,10 @@ parameters:
       collectors:
         - type: classLike
           value: '^App\\Application\\'
+    - name: Twig
+      collectors:
+        - type: classLike
+          value: '^App\\Twig\\'
     - name: Infrastructure
       collectors:
         - type: classLike
@@ -29,6 +34,10 @@ parameters:
   ruleset:
     Domain: ~
     Application:
+      - Domain
+      - Symfony
+    Twig:
+      - Application
       - Domain
       - Symfony
     Infrastructure:

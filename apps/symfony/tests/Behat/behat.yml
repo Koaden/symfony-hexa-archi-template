@@ -1,0 +1,18 @@
+default:
+  extensions:
+    FriendsOfBehat\SymfonyExtension:
+      bootstrap: tests/bootstrap.php
+      kernel:
+        environment: test
+        debug: true
+    Behat\MinkExtension:
+      base_url: 'http://localhost'
+      sessions:
+        default:
+          symfony: ~
+  suites:
+    default:
+      paths:
+        - '%paths.base%/features'
+      contexts:
+        - App\Tests\Behat\Context\FeatureContext

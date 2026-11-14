@@ -10,11 +10,16 @@
         "doctrine/doctrine-bundle": "^3.3",
         "doctrine/doctrine-migrations-bundle": "^4.0",
         "doctrine/orm": "^3.7",
+        "symfony/asset": "7.4.*",
+        "symfony/asset-mapper": "7.4.*",
         "symfony/console": "7.4.*",
         "symfony/flex": "^2",
         "symfony/framework-bundle": "7.4.*",
         "symfony/messenger": "7.4.*",
         "symfony/runtime": "7.4.*",
+        "symfony/translation": "7.4.*",
+        "symfony/twig-bundle": "7.4.*",
+        "symfony/ux-twig-component": "^3.7",
         "symfony/yaml": "7.4.*",
         "sentry/sentry-symfony": "^5.15"
     },
@@ -50,7 +55,8 @@
     "scripts": {
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
-            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+            "assets:install %PUBLIC_DIR%": "symfony-cmd",
+            "importmap:install": "symfony-cmd"
         },
         "post-install-cmd": [
             "@auto-scripts"
@@ -70,9 +76,13 @@
         }
     },
     "require-dev": {
+        "behat/behat": "^3.34",
+        "behat/mink-browserkit-driver": "^2.3",
         "deptrac/deptrac": "^4.7",
         "doctrine/doctrine-fixtures-bundle": "^4.3",
-        "friendsofphp/php-cs-fixer": "^3.95",
+        "friends-of-behat/mink-extension": "^2.7.5",
+        "friends-of-behat/symfony-extension": "^2.7",
+        "friendsofphp/php-cs-fixer": "^3.95.28",
         "phpstan/phpstan": "^2.3",
         "phpunit/phpunit": "^13.4",
         "symfony/browser-kit": "7.4.*",

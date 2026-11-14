@@ -1,0 +1,9 @@
+parameters:
+    tmpDir: .phpstan-cache
+    level: max
+    paths:
+        - ../../bin
+        - ../../config
+        - ../../public
+        - ../../src
+        - ../../tests
