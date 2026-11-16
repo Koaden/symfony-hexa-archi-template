@@ -89,6 +89,7 @@ RUN set -e; \
     SENTRY_DSN= php bin/console importmap:install; \
     SENTRY_DSN= php bin/console asset-map:compile --env=prod; \
     mkdir -p var; \
+    dpkg --purge --force-depends linux-libc-dev; \
     useradd --system --uid 1000 --no-create-home ${USER}; \
     setcap CAP_NET_BIND_SERVICE=+ep /usr/local/bin/frankenphp; \
     mkdir -p /data/caddy /config/caddy; \
