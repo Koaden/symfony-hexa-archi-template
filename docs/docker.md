@@ -15,7 +15,7 @@ flowchart LR
     end
 
     P -.->|"caddy_data / caddy_config"| CV[("volumes")]
-    D -.->|"db_data / db_data_test / db_data_prod"| CV
+    D -.->|"db_data / db_data_prod"| CV
 ```
 
 ## File map
@@ -23,9 +23,9 @@ flowchart LR
 | Path | Role |
 | --- | --- |
 | `compose.yaml` | Shared services: `php` (built image) and `db`, network, volumes |
-| `compose.override.yaml` | Dev: target `dev`, bind mount, ports 80/443, Xdebug, DB published on 5432 |
-| `compose.test.yaml` | Test: target `test`, no bind mount, separate DB volume |
-| `compose.prod.yaml` | Prod: target `prod`, restart policy, separate DB volume |
+| `compose.override.yaml` | Dev: target `dev`, bind mount, configurable ports, Xdebug (off by default), Adminer, DB published on loopback |
+| `compose.test.yaml` | Test: target `test`, no bind mount, throwaway tmpfs database `<db>_test`, run as the `<project>-test` Compose project |
+| `compose.prod.yaml` | Prod: target `prod`, read-only non-root container, limits, log rotation, DB volume, backups |
 | `makefile` | `make dev`, `make test`, `make prod`, ... |
 | `docker/frankenphp/Dockerfile` | Multi-stage image (`base`, `dev`, `test`, `prod`) |
 | `docker/frankenphp/Caddyfile.*` | One Caddy config per environment |
@@ -75,11 +75,15 @@ process, a second config language, and a separate certificate workflow.
 | --- | --- | --- |
 | `base` | Shared PHP runtime | System libs, PHP extensions, Composer |
 | `dev` | Local development | Xdebug, `php.ini.dev`, bind mount, composer install on first boot |
-| `test` | CI / `make test` | Source baked into image, no Xdebug, no bind mount |
-| `prod` | Production | `--no-dev` Composer, OPcache + JIT, no source rebuild at runtime |
+| `test` | CI / `make test` | Source baked into image, pcov instead of Xdebug, no bind mount |
+| `prod` | Production | `--no-dev` Composer, OPcache + JIT, unprivileged `app` user (uid 1000) |
 
 Building separate stages keeps dev tools (Xdebug) out of production and lets the
 test/prod images be immutable artifacts.
+
+In `test` and `prod`, `composer.json` / `composer.lock` are copied and installed
+before the sources, so a code change does not invalidate the vendor layer. Composer
+downloads go through a BuildKit cache mount.
 
 Each environment also tags its own image (`<project>-php:dev`, `:test`, `:prod`).
 Without distinct tags, building `prod` would overwrite the image used by `make dev`,
@@ -93,9 +97,12 @@ encodes the right `-f` combination:
 
 ```bash
 make dev      # compose.yaml + compose.override.yaml
-make test     # compose.yaml + compose.test.yaml
+make test     # compose.yaml + compose.test.yaml, project <project>-test
 make prod     # compose.yaml + compose.prod.yaml
 ```
+
+`make help` lists every target. `BUILD=` (empty) skips the image rebuild, used by CI
+after it built the image with a layer cache.
 
 ## PHP extensions
 
@@ -119,28 +126,41 @@ are installed in `base` because the extensions compile against them.
 - The Symfony application lives in `apps/symfony` and is bind-mounted into the
   container, so edits are visible immediately.
 - OPcache is disabled and its timestamp checks are on (`php.ini.dev`).
-- Xdebug listens on port 9003. On Linux, `host.docker.internal` is resolved via
+- Xdebug is off by default (`XDEBUG_MODE=off`). `make dev.debug` restarts `php`
+  with `debug,develop`. It listens on port 9003. On Linux, `host.docker.internal` is resolved via
   `extra_hosts: host.docker.internal:host-gateway` in `compose.override.yaml`.
 - `docker-entrypoint.sh` runs `composer install` on first boot **only if
-  `composer.json` exists** and `vendor/` is missing. This also allows
-  `make init-symfony` to run `composer create-project` in an empty directory.
+  `composer.json` exists** and `vendor/` is missing.
 - Caddy serves `:80` without TLS for a simple local URL.
+- Host ports are configurable in `.env` (`HTTP_PORT`, `HTTPS_PORT`, `DB_PORT`,
+  `ADMINER_PORT`) so several projects can run side by side. The database and Adminer
+  are published on `127.0.0.1` only.
+- Adminer runs at `http://localhost:8080` (system PostgreSQL, server `db`, then the
+  `POSTGRES_*` values from `.env`). It exists only in the dev stack.
+- The Symfony profiler (`symfony/web-profiler-bundle`, dev only) shows its toolbar
+  on every page and the full profile at `/_profiler`.
+- `php` has a healthcheck, and `docker compose watch` re-runs `composer install` or
+  `importmap:install` when `composer.lock` or `importmap.php` change.
 
 ## Test mode
 
 - The image bakes the source and dependencies at build time; there is no bind
   mount, so tests run against exactly what was built.
-- `make test` passes `--build`, so the image is rebuilt before each run.
-- `APP_ENV=test`, `APP_SECRET=test`; `DATABASE_URL` is the same as dev
-  (`db:5432/database`).
-- Isolation comes from the `db_data_test` volume, not from a second database
-  name. Dev, test and prod each get their own volume and can reuse the same
-  database name.
-- To start from an empty test database:
-
-  ```bash
-  docker compose -f compose.yaml -f compose.test.yaml down -v
-  ```
+- `make test` passes `--build`, so the image is rebuilt before each run (cheap
+  thanks to the layer cache).
+- `APP_ENV=test`, `APP_SECRET=test`; `DATABASE_URL` targets `<POSTGRES_DB>_test`.
+- The stack runs as its own Compose project, `<project>-test` (`docker compose -p`).
+  Containers, network and volumes are separate from dev, so running the tests can
+  never recreate or touch the dev database. Sharing one project name makes Compose
+  recreate the dev `db` container with the test configuration.
+- The test database lives on a `tmpfs`: nothing persists, nothing to clean up.
+  `make test` and `make lint` run `make test.down` at the end, success or not.
+- `make behat` first runs `make database.test.prepare` (create the database if
+  needed, run the migrations). `DatabaseContext` then truncates every table before
+  each scenario, so scenarios create their own data. Doctrine fixtures are loaded in
+  dev only, never in test.
+- `make db.restore.test [FILE=backups/x.dump]` restores a dump in that throwaway
+  database and lists the tables, to prove a backup is usable.
 
 ## Production mode
 
@@ -153,6 +173,17 @@ are installed in `base` because the extensions compile against them.
 - Worker mode is intentionally **disabled**. PHP workers require
   `runtime/frankenphp-symfony` and careful service reset; enabling it without that
   leaks state between requests. See below to opt in.
+- The `php` container runs as the unprivileged `app` user, with a read-only
+  filesystem, `var/` on a tmpfs, all capabilities dropped except
+  `NET_BIND_SERVICE`, memory/CPU limits (`PHP_MEM_LIMIT`, `PHP_CPUS`,
+  `DB_MEM_LIMIT`) and rotated logs. UDP 443 is published for HTTP/3.
+- `make prod` refuses the dev placeholder `APP_SECRET`. `POSTGRES_PASSWORD` is
+  required.
+- `db-backup` dumps the database daily and keeps 7 days in `db_backups`.
+  `make prod.offsite` also starts `db-offsite`, which copies the dumps to an rclone
+  remote (`OFFSITE_REMOTE`, config in git-ignored `docker/rclone/rclone.conf`).
+  Run `make db.restore.test` regularly: a backup that was never restored is not a
+  backup.
 - Composer scripts are skipped at build time (`--no-scripts`) to avoid building a
   cache without runtime configuration. Warm it at deploy time if needed:
 
@@ -184,7 +215,7 @@ The variables have one consumer each:
 
 Required production values:
 
-- `APP_SECRET` — generate with `openssl rand -hex 32`;
+- `APP_SECRET` (the `.env.dist` value is a dev placeholder) — generate with `openssl rand -hex 32`;
 - `SERVER_NAME` — public hostname for Caddy/ACME;
 - `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` — db container init only, use real secrets;
 - `DATABASE_URL` — point at the managed database in a real deployment.
@@ -230,28 +261,35 @@ pipelines.
 | Volume | Used by | Content |
 | --- | --- | --- |
 | `db_data` | dev | Development database |
-| `db_data_test` | test | Test database |
 | `db_data_prod` | prod | Production database |
 | `db_backups` | prod | Automatic daily database backups |
 | `caddy_data` | dev/prod | TLS certificates and Caddy state |
 | `caddy_config` | dev/prod | Caddy runtime config |
 
-Back up production data with `pg_dump`; volumes are not backups.
+The test stack has no volume (tmpfs). Back up production data with `pg_dump`; volumes are not backups.
 
 ## Common commands
 
 ```bash
+make help                 # list every target
 make dev                  # start dev stack
+make dev.debug            # restart php with Xdebug
+make shell                # shell in the dev php container
+make logs                 # follow dev logs
+make composer ARGS="..."  # run composer in the dev container
 make stop                 # stop every compose project
-make build                # build the dev image
-make init-symfony         # create the Symfony skeleton in apps/symfony
-make test                 # rebuild + run PHPUnit
+make test                 # PHPUnit + Behat (migrated, truncated DB), then remove the test stack
 make lint                 # PHPStan (max), PHP-CS-Fixer, Deptrac
-make phpstan         # PHPStan (max)
-make deptrac         # Deptrac layer rules
-make cs-fixer              # PHP-CS-Fixer dry run
 make prod                 # build and start production stack
-
-docker compose -f compose.yaml -f compose.override.yaml logs -f php
-docker compose -f compose.yaml -f compose.override.yaml exec php sh
+make db.backup            # dump the production database to ./backups
+make db.restore.test      # prove a dump restores
 ```
+
+## CI
+
+`.github/workflows/ci.yml` runs three parallel jobs: `test`, `lint` and
+`prod-image`. The test image is built with `docker/build-push-action` and a GitHub
+Actions layer cache, then `make ... BUILD=` reuses it. `prod-image` smoke-tests the
+hardened production container and scans it with Trivy (critical and high, fixed
+vulnerabilities only). Dependabot watches the Dockerfile, the compose files, Composer
+and the actions.

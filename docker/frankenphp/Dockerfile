@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 FROM dunglas/frankenphp:1-php8.4 AS base
 
 WORKDIR /app/apps/symfony
@@ -52,14 +53,19 @@ FROM base AS test
 
 ENV APP_ENV=test
 
-COPY apps/symfony /app/apps/symfony
+RUN install-php-extensions pcov
+
 COPY docker/frankenphp/php.ini.dev $PHP_INI_DIR/conf.d/99-custom.ini
 COPY docker/frankenphp/Caddyfile.test /etc/frankenphp/Caddyfile
 
-RUN if [ -f composer.json ]; then \
-        composer install --no-interaction --prefer-dist --optimize-autoloader --no-scripts; \
-        php bin/console importmap:install --no-interaction; \
-    fi
+COPY apps/symfony/composer.json apps/symfony/composer.lock* apps/symfony/symfony.lock* ./
+RUN --mount=type=cache,target=/root/.cache/composer \
+    composer install --no-interaction --prefer-dist --no-scripts --no-autoloader
+
+COPY apps/symfony /app/apps/symfony
+
+RUN composer dump-autoload --optimize \
+    && php bin/console importmap:install --no-interaction
 
 CMD ["frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile", "--adapter", "caddyfile"]
 
@@ -67,18 +73,27 @@ FROM base AS prod
 
 ENV APP_ENV=prod
 
-COPY apps/symfony /app/apps/symfony
+ARG USER=app
 
 COPY docker/frankenphp/php.ini.prod $PHP_INI_DIR/conf.d/99-custom.ini
 COPY docker/frankenphp/Caddyfile.prod /etc/frankenphp/Caddyfile
 
+COPY apps/symfony/composer.json apps/symfony/composer.lock* apps/symfony/symfony.lock* ./
+RUN --mount=type=cache,target=/root/.cache/composer \
+    composer install --no-dev --no-interaction --prefer-dist --no-scripts --no-autoloader
+
+COPY apps/symfony /app/apps/symfony
+
 RUN set -e; \
-    if [ -f composer.json ]; then \
-        composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-scripts; \
-        composer dump-autoload --optimize --classmap-authoritative; \
-        php bin/console importmap:install; \
-        php bin/console asset-map:compile --env=prod; \
-    fi; \
-    chown -R www-data:www-data /app/apps/symfony/var 2>/dev/null || true
+    composer dump-autoload --no-dev --optimize --classmap-authoritative; \
+    SENTRY_DSN= php bin/console importmap:install; \
+    SENTRY_DSN= php bin/console asset-map:compile --env=prod; \
+    mkdir -p var; \
+    useradd --system --uid 1000 --no-create-home ${USER}; \
+    setcap CAP_NET_BIND_SERVICE=+ep /usr/local/bin/frankenphp; \
+    mkdir -p /data/caddy /config/caddy; \
+    chown -R ${USER}:${USER} /data/caddy /config/caddy /app/apps/symfony/var
+
+USER ${USER}
 
 CMD ["frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile", "--adapter", "caddyfile"]

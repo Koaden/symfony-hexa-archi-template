@@ -12,3 +12,4 @@
 
 # Database backups
 /backups/
+/docker/rclone/rclone.conf

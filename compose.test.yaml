@@ -6,13 +6,13 @@ services:
     environment:
       APP_ENV: test
       APP_SECRET: test
-    volumes: []
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}_test?serverVersion=18&charset=utf8
 
   db:
-    volumes:
-      - db_data_test:/var/lib/postgresql
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}_test
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}_test"]
+    volumes: !reset []
     tmpfs:
-      - /tmp
-
-volumes:
-  db_data_test:
+      - /var/lib/postgresql

@@ -11,8 +11,8 @@ return static function (ContainerConfigurator $container): void {
 
     $container->extension('sentry', [
         'dsn' => '%env(SENTRY_DSN)%',
-        'environment' => '%kernel.environment%',
         'options' => [
+            'environment' => '%kernel.environment%',
             'traces_sample_rate' => 0.2,
             'profiles_sample_rate' => 0.0,
         ],
