@@ -11,8 +11,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  ci:
-    name: Test and lint
+  test:
+    name: Test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -21,9 +21,91 @@ jobs:
       - name: Prepare environment
         uses: ./.github/actions/prepare-env
 
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build test image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/frankenphp/Dockerfile
+          target: test
+          tags: app-php:test
+          load: true
+          cache-from: type=gha,scope=test
+          cache-to: type=gha,scope=test,mode=max
+
       - name: Run tests
-        run: make test
+        run: make test BUILD=
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Prepare environment
+        uses: ./.github/actions/prepare-env
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build test image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/frankenphp/Dockerfile
+          target: test
+          tags: app-php:test
+          load: true
+          cache-from: type=gha,scope=test
 
       - name: Run lint
-        if: ${{ !cancelled() }}
-        run: make lint
+        run: make lint BUILD=
+
+  prod-image:
+    name: Production image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build prod image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/frankenphp/Dockerfile
+          target: prod
+          tags: app-php:prod
+          load: true
+          cache-from: type=gha,scope=prod
+          cache-to: type=gha,scope=prod,mode=max
+
+      - name: Smoke test
+        run: |
+          docker run -d --name smoke --read-only \
+            --tmpfs /tmp --tmpfs /app/apps/symfony/var:uid=1000,gid=999 \
+            --cap-drop ALL --cap-add NET_BIND_SERVICE \
+            -e APP_SECRET=ci -e SERVER_NAME=:80 -e DEFAULT_URI=http://localhost \
+            -e APP_SHARE_DIR=var/share -e SENTRY_DSN= \
+            -e DATABASE_URL=postgresql://u:p@db:5432/d \
+            -p 8080:80 app-php:prod
+          for i in $(seq 1 20); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/ || true)
+            [ "$code" = "200" ] && exit 0
+            sleep 2
+          done
+          docker logs smoke
+          exit 1
+
+      - name: Scan image
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: app-php:prod
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "1"

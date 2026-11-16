@@ -11,8 +11,12 @@ return static function (ContainerConfigurator $container): void {
     $container->import('services/repositories.php');
     $container->import('services/messenger.php');
 
-    if (in_array($container->env(), ['dev', 'test'], true)) {
+    if ($container->env() === 'dev') {
         $container->import('services/data_fixtures.php');
+    }
+
+    if ($container->env() === 'test') {
+        $container->import('services/behat.php');
     }
 
     $services = $container->services()

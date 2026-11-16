@@ -1,3 +1,9 @@
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   php:
     image: ${COMPOSE_PROJECT_NAME:-app}-php:prod
@@ -7,18 +13,35 @@ services:
     ports:
       - "80:80"
       - "443:443"
+      - "443:443/udp"
     environment:
       APP_ENV: prod
       APP_SECRET: ${APP_SECRET:?APP_SECRET is required}
       SERVER_NAME: ${SERVER_NAME:-localhost}
+      SENTRY_DSN: ${SENTRY_DSN:-}
     volumes:
       - caddy_data:/data
       - caddy_config:/config
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /app/apps/symfony/var:uid=1000,gid=999
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    mem_limit: ${PHP_MEM_LIMIT:-512m}
+    cpus: ${PHP_CPUS:-1.0}
+    logging: *default-logging
 
   db:
     restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
     volumes:
       - db_data_prod:/var/lib/postgresql
+    mem_limit: ${DB_MEM_LIMIT:-512m}
+    logging: *default-logging
 
   db-backup:
     image: postgres:18-alpine
@@ -41,6 +64,27 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    logging: *default-logging
+
+  # Optional off-site copy of the backups. Enable with `make prod.offsite`.
+  # Needs docker/rclone/rclone.conf (git-ignored) and OFFSITE_REMOTE, e.g. "b2:my-bucket/db".
+  db-offsite:
+    image: rclone/rclone:1
+    profiles: ["offsite"]
+    restart: unless-stopped
+    entrypoint: ["/bin/sh", "-c"]
+    environment:
+      OFFSITE_REMOTE: ${OFFSITE_REMOTE:-}
+    command: >
+      test -n "$$OFFSITE_REMOTE" || { echo "OFFSITE_REMOTE is required"; exit 1; };
+      while true; do
+        rclone copy /backups "$$OFFSITE_REMOTE";
+        sleep 86400;
+      done
+    volumes:
+      - db_backups:/backups:ro
+      - ./docker/rclone/rclone.conf:/config/rclone/rclone.conf:ro
+    logging: *default-logging
 
 volumes:
   db_data_prod:

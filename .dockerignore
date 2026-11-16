@@ -15,3 +15,10 @@ apps/symfony/assets/vendor
 **/.DS_Store
 
 backups/
+
+.github
+docs
+backups
+compose*.yaml
+makefile
+**/*.md

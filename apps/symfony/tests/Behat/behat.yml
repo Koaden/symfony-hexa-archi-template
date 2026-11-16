@@ -15,4 +15,5 @@ default:
       paths:
         - '%paths.base%/features'
       contexts:
+        - App\Tests\Behat\Context\DatabaseContext
         - App\Tests\Behat\Context\FeatureContext
