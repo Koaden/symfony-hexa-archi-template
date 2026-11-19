@@ -37,8 +37,8 @@ stop: ## Stop every compose project
 	$(COMPOSE_PROD) down --remove-orphans 2>/dev/null || true
 
 .PHONY: test
-test: ## Run PHPUnit and Behat, then remove the test stack
-	@status=0; $(MAKE) phpunit behat || status=$$?; $(MAKE) test.down; exit $$status
+test: ## Run PHPUnit, the migration check and Behat, then remove the test stack
+	@status=0; $(MAKE) phpunit test.migration behat || status=$$?; $(MAKE) test.down; exit $$status
 
 .PHONY: test.down
 test.down: ## Remove the test stack
@@ -51,6 +51,10 @@ phpunit: ## Run PHPUnit
 .PHONY: database.test.prepare
 database.test.prepare: ## Create and migrate the test database
 	$(COMPOSE_TEST) run --rm $(BUILD) php sh -c 'php bin/console doctrine:database:create --if-not-exists --env=test && php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration --env=test'
+
+.PHONY: test.migration
+test.migration: ## Check migrations apply on an empty database and match the mapping
+	$(COMPOSE_TEST) run --rm $(BUILD) php sh -c 'php bin/console doctrine:database:drop --force --if-exists --env=test && php bin/console doctrine:database:create --env=test && php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration --env=test && php bin/console doctrine:schema:validate --env=test'
 
 .PHONY: behat
 behat: database.test.prepare ## Run Behat
