@@ -1,0 +1,17 @@
+{
+    "$schema": "../../vendor/infection/infection/resources/schema.json",
+    "source": {
+        "directories": ["../../src/Domain"]
+    },
+    "phpUnit": {
+        "configDir": "../../tests/PHPUnit"
+    },
+    "mutators": {
+        "@default": true
+    },
+    "logs": {
+        "text": "../../var/infection/infection.log"
+    },
+    "minMsi": 80,
+    "minCoveredMsi": 90
+}
