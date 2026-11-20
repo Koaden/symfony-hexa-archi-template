@@ -61,8 +61,8 @@ behat: database.test.prepare ## Run Behat
 	$(COMPOSE_TEST) run --rm $(BUILD) php vendor/bin/behat --config=tests/Behat/behat.yml
 
 .PHONY: lint
-lint: ## Run PHPStan, PHP CS Fixer (dry run) and Deptrac
-	@status=0; $(MAKE) phpstan php-cs-fixer deptrac || status=$$?; $(MAKE) test.down; exit $$status
+lint: ## Run PHPStan, PHP CS Fixer (dry run), Deptrac and the project rules
+	@status=0; $(MAKE) phpstan php-cs-fixer deptrac lint.rules || status=$$?; $(MAKE) test.down; exit $$status
 
 .PHONY: phpstan
 phpstan: ## Run PHPStan
@@ -145,3 +145,11 @@ importmap.update:
 .PHONY: importmap.audit
 importmap.audit:
 	$(COMPOSE_DEV) run --rm $(BUILD) php php bin/console importmap:audit
+
+.PHONY: lint.rules
+lint.rules: ## Check the project rules a linter cannot express (migration docblock, translation keys, no ignores)
+	$(COMPOSE_TEST) run --rm $(BUILD) php sh lint/rules/check.sh
+
+.PHONY: infection
+infection: database.test.prepare ## Run mutation testing on the Domain
+	$(COMPOSE_TEST) run --rm $(BUILD) php vendor/bin/infection --configuration=lint/infection/infection.json5 --threads=max --no-progress --show-mutations

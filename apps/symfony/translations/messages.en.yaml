@@ -1,23 +1,26 @@
-demo.loaded_at: 'Demo loaded at %now%'
-demo.welcome_prefix: 'Welcome to'
-demo.welcome_suffix: 'Symfony Hexagonal Architecture Template'
-demo.info: 'If you are seeing this page everything is working, you can now remove demo files and create your application.'
-demo.htmx.title: 'HTMX test'
-demo.htmx.description: 'Load a server-rendered fragment without a full page reload.'
-demo.htmx.button: 'Test HTMX'
-demo.documentations: 'Documentations'
-demo.project: 'Project'
-demo.link.repository: 'Repository'
-demo.link.architecture: 'Architecture'
-demo.link.docker: 'Docker'
-demo.stack: 'Stack'
-demo.link.symfony: 'Symfony'
-demo.link.twig: 'Twig'
-demo.link.htmx: 'HTMX'
-demo.link.asset_mapper: 'AssetMapper'
-demo.tests: 'Tests'
-demo.link.phpunit: 'PHPUnit'
-demo.link.phpstan: 'PHPStan'
-demo.link.php_cs_fixer: 'PHP-CS-Fixer'
-demo.link.deptrac: 'Deptrac'
-demo.link.behat: 'Behat'
+demo:
+    loaded_at: "Demo loaded at %now%"
+    welcome_prefix: "Welcome to"
+    welcome_suffix: "Symfony Hexagonal Architecture Template"
+    info: "If you are seeing this page everything is working, you can now remove demo files and create your application."
+    htmx:
+        title: "HTMX test"
+        description: "Load a server-rendered fragment without a full page reload."
+        button: "Test HTMX"
+    documentations: "Documentations"
+    project: "Project"
+    link:
+        repository: "Repository"
+        architecture: "Architecture"
+        docker: "Docker"
+        symfony: "Symfony"
+        twig: "Twig"
+        htmx: "HTMX"
+        asset_mapper: "AssetMapper"
+        phpunit: "PHPUnit"
+        phpstan: "PHPStan"
+        php_cs_fixer: "PHP-CS-Fixer"
+        deptrac: "Deptrac"
+        behat: "Behat"
+    stack: "Stack"
+    tests: "Tests"

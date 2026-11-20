@@ -1,6 +1,11 @@
+includes:
+    - ../../vendor/phpstan/phpstan-strict-rules/rules.neon
+    - ../../vendor/phpstan/phpstan-deprecation-rules/rules.neon
+
 parameters:
     tmpDir: .phpstan-cache
     level: max
+    reportUnmatchedIgnoredErrors: true
     paths:
         - ../../bin
         - ../../config

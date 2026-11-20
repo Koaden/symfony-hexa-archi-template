@@ -5,8 +5,17 @@ parameters:
   layers:
     - name: Domain
       collectors:
+        - type: bool
+          must:
+            - type: classLike
+              value: '^App\\Domain\\'
+          must_not:
+            - type: classLike
+              value: '^App\\Domain\\UseCase\\.*\\Handler$'
+    - name: Handler
+      collectors:
         - type: classLike
-          value: '^App\\Domain\\'
+          value: '^App\\Domain\\UseCase\\.*\\Handler$'
     - name: Application
       collectors:
         - type: classLike
@@ -33,6 +42,8 @@ parameters:
           value: '^App\\Kernel$'
   ruleset:
     Domain: ~
+    Handler:
+      - Domain
     Application:
       - Domain
       - Symfony

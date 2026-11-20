@@ -21,7 +21,9 @@ return static function (ContainerConfigurator $container): void {
     ];
 
     foreach ($mappings as [$directory, $domainNamespace, $domainSuffix, $infrastructureNamespace, $infrastructureSuffix]) {
-        foreach (glob($directory.'/*'.$domainSuffix.'.php') ?: [] as $file) {
+        $files = glob($directory.'/*'.$domainSuffix.'.php');
+
+        foreach (false === $files ? [] : $files as $file) {
             $name = basename($file, '.php');
             $base = substr($name, 0, -strlen($domainSuffix));
             $domainClass = $domainNamespace.$name;

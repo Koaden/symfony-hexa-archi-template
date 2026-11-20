@@ -33,7 +33,7 @@
             restrictWarnings="true"
     >
         <include>
-            <directory>../src</directory>
+            <directory>../../src</directory>
         </include>
 
         <deprecationTrigger>

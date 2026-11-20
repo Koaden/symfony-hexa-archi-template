@@ -19,17 +19,19 @@ final class DatabaseContext implements Context
     #[BeforeScenario]
     public function truncateTables(): void
     {
-        $tables = array_filter(
-            $this->connection->createSchemaManager()->listTableNames(),
-            static fn (string $table): bool => self::MIGRATIONS_TABLE !== $table,
-        );
+        $platform = $this->connection->getDatabasePlatform();
+        $tables = [];
+
+        foreach ($this->connection->createSchemaManager()->introspectTableNames() as $name) {
+            if (self::MIGRATIONS_TABLE !== $name->getUnqualifiedName()->getValue()) {
+                $tables[] = $name->toSQL($platform);
+            }
+        }
 
         if ([] === $tables) {
             return;
         }
 
-        $quotedTables = array_map($this->connection->quoteSingleIdentifier(...), $tables);
-
-        $this->connection->executeStatement(sprintf('TRUNCATE TABLE %s RESTART IDENTITY CASCADE', implode(', ', $quotedTables)));
+        $this->connection->executeStatement(sprintf('TRUNCATE TABLE %s RESTART IDENTITY CASCADE', implode(', ', $tables)));
     }
 }
