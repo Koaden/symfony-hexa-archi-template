@@ -3,7 +3,7 @@ FROM dunglas/frankenphp:1-php8.4 AS base
 
 WORKDIR /app/apps/symfony
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
     git \
     unzip \
     curl \
